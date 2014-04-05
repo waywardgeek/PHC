@@ -11,10 +11,11 @@ EARWORM=EARWORM
 GAMBIT=Gambit/src
 LANAREA=Lanarea
 LYRA=Lyra2/src/sse
+M3LCRYPT=M3lcrypt/code
 TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
 
-EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-lyra phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
+EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -48,6 +49,9 @@ phs-lanarea: main.c $(LANAREA)/lanarea.c
 
 phs-lyra: main.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
 	$(CC) $(CFLAGS) -o $@ $^
+
+phs-m3lcrypt: main.c $(M3LCRYPT)/Sha2.c $(M3LCRYPT)/m3lcrypt.c
+	$(CC) $(CFLAGS) -D_HF=0 -D_VSPACE=16 -o $@ $^
 
 phs-pomelo: main.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
