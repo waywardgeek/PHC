@@ -45,10 +45,11 @@ static uint32_t readUint32(char flag, char *arg) {
     return value;
 }
 
-// Print a value out in hex - from Catena.
+/* Print a value out in hex - from Catena. */
 static void printHex(const char *message, uint8_t *x, uint32_t len) {
     puts(message);
-    for(uint32_t i = 0; i < len; i++) {
+    uint32_t i;
+    for(i = 0; i < len; i++) {
         if(i != 0 && i % 8 == 0) {
             puts("");
         }
@@ -57,22 +58,24 @@ static void printHex(const char *message, uint8_t *x, uint32_t len) {
     printf("     %d (octets)\n\n", len);
 }
 
-// Decode a little-endian length len vector of (unsigned char) into a length
-// len/4 vector of (uint32_t).  Assumes len is a multiple of 4.
-static inline void decodeLittleEndian(uint32_t *dst, const uint8_t *src, uint32_t len) {
+/* Decode a little-endian length len vector of (unsigned char) into a length
+   len/4 vector of (uint32_t).  Assumes len is a multiple of 4. */
+static void decodeLittleEndian(uint32_t *dst, const uint8_t *src, uint32_t len) {
     const uint8_t *p = src;
-    for(uint32_t i = 0; i < len / 4; i++) {
+    uint32_t i;
+    for(i = 0; i < len / 4; i++) {
         dst[i] = ((uint32_t)(p[0]) + ((uint32_t)(p[1]) << 8) + ((uint32_t)(p[2]) << 16) +
             ((uint32_t)(p[3]) << 24));
         p += 4;
     }
 }
 
-// Encode a length len/4 vector of (uint32_t) into a length len vector of
-// (unsigned char) in little-endian form.  Assumes len is a multiple of 4.
-static inline void encodeLittleEndian(uint8_t *dst, const uint32_t *src, uint32_t len) {
+/* Encode a length len/4 vector of (uint32_t) into a length len vector of
+   (unsigned char) in little-endian form.  Assumes len is a multiple of 4. */
+static void encodeLittleEndian(uint8_t *dst, const uint32_t *src, uint32_t len) {
     uint8_t *p = dst;
-    for (uint32_t i = 0; i < len / 4; i++) {
+    uint32_t i;
+    for (i = 0; i < len / 4; i++) {
         *p++ = *src;
         *p++ = *src >> 8;
         *p++ = *src >> 16;
@@ -124,7 +127,8 @@ int main(int argc, char **argv) {
     }
 
     if(outputDieharderText || outputDieharderBinary) {
-        for(uint32_t i = 0; (i < numCalls) || outputDieharderBinary; i++) {
+        uint32_t i;
+        for(i = 0; (i < numCalls) || outputDieharderBinary; i++) {
             uint8_t pwdbuf[passwordlen + 4];
             memcpy(pwdbuf, password, passwordlen);
             encodeLittleEndian(pwdbuf + passwordlen, &i, 4);
@@ -133,7 +137,8 @@ int main(int argc, char **argv) {
                 return 1;
             }
             if(outputDieharderText) {
-                for(uint32_t j = 0; j < 8; j++) {
+                uint32_t j;
+                for(j = 0; j < 8; j++) {
                     uint32_t v;
                     decodeLittleEndian(&v, out + j*4, 4);
                     printf("%u\n", v);

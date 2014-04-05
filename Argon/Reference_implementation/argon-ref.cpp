@@ -225,7 +225,7 @@ void ShuffleSlices(int128* state, unsigned width)
 
 
 
-int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen, unsigned int t_cost, unsigned int m_cost)
+extern "C" int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen, unsigned int t_cost, unsigned int m_cost)
 {
 	Init();  //Initializing Galois field multiplication table.
 	int128* state;  //Array A of blocks
@@ -390,6 +390,7 @@ int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt
 	return 0;
 }
 
+#ifdef ARGON_TEST
 void GenKat(unsigned outlen)
 {
 	unsigned char out[32];
@@ -420,3 +421,4 @@ int main(int argc, char* argv[])
 	GenKat(32);
 	return 0;
 }
+#endif
