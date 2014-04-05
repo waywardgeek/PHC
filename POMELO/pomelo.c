@@ -43,8 +43,9 @@ int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt
     for (i = 0; i < inlen; i++)   ((unsigned char*)S)[i] = ((unsigned char*)in)[i];
     for (i = inlen; i < 128; i++) ((unsigned char*)S)[i] = 0;
     // load salt into S
-    for (i = 0; i < saltlen; i++)   ((unsigned char*)S)[i] = ((unsigned char*)salt)[i];
-    for (i = saltlen; i < 160; i++) ((unsigned char*)S)[i] = 0;
+    for (i = inlen; i < inlen + saltlen; i++)   ((unsigned char*)S)[i] = ((unsigned char*)salt)[i];
+    for (i = inlen + saltlen; i < 160; i++) ((unsigned char*)S)[i] = 0;
+
 
     ((unsigned char*)S)[160] = inlen;   // load password length (in bytes) into S;
     ((unsigned char*)S)[161] = saltlen; // load salt length (in bytes) into S;
