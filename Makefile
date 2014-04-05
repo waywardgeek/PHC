@@ -10,10 +10,11 @@ CATFISH=Catfish/ref-c
 EARWORM=EARWORM
 GAMBIT=Gambit/src
 LANAREA=Lanarea
+LYRA=Lyra2/src/sse
 TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
 
-EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
+EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-lyra phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -44,6 +45,9 @@ phs-gambit: main.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
 phs-lanarea: main.c $(LANAREA)/lanarea.c
 	(cd $(LANAREA)/libb2; ./configure && make)
 	$(CC) $(CFLAGS) -o $@ $^ $(LANAREA)/libb2/src/.libs/libb2_la-blake2b.o
+
+phs-lyra: main.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 phs-pomelo: main.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
