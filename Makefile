@@ -44,7 +44,7 @@ phs-gambit: main.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
 phs-lanarea: main.c $(LANAREA)/lanarea.c
-	(cd $(LANAREA)/libb2; ./configure && make)
+	(cd $(LANAREA)/libb2; autoreconf; automake --add-missing; ./configure && make)
 	$(CC) $(CFLAGS) -o $@ $^ $(LANAREA)/libb2/src/.libs/libb2_la-blake2b.o
 
 phs-lyra: main.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
