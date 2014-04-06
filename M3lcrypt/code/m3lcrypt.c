@@ -11,7 +11,7 @@
  *
 \********************************************************************/
 
-
+#include <string.h>
 #include "m3lcrypt.h" 
 
 #if defined(__cplusplus)
