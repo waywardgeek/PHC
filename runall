@@ -1,6 +1,7 @@
 #!/bin/bash
 
+echo > dieharder_results
 for phs in phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn; do 
     echo "************ Running $phs with t_cost=1 m_cost=1"
-    ./$phs -D 1 1 | dieharder -g 200 -a | head -12
+    ./$phs -D 1 1 | dieharder -g 200 -a | head -9 2>&1 >> dieharder_results
 done
