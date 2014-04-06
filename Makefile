@@ -18,7 +18,7 @@ TWOCATS=TwoCats/twocats
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
-phs-omegacrypt phs-parallela phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
+phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -70,6 +70,9 @@ phs-parallela: main.c Parallel/code/c++/parallel.cpp Parallel/code/c++/sha512.cp
 
 phs-pomelo: main.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
+
+phs-polypasshash: main.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyPassHash/polypasshash-c/lib/libgfshare.c
+	$(CC) $(CFLAGS) -IPolyPassHash/polypasshash-c/include -o $@ $^
 
 phs-schvrch: main.c Schvrch/schvrch.c
 	$(CC) $(CFLAGS) -o $@ $^
