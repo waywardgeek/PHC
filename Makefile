@@ -2,7 +2,8 @@ CC=gcc
 CPP=g++
 CFLAGS=-Wall -O3 -march=native -std=c99 -pthread -lcrypto -lm
 #CFLAGS=-Wall -g -march=native -std=c99 -pthread -lcrypto -lm
-CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
+#CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
+CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
 
 BATTCRYPT=Battcrypt/code/c++
 CATENA=Catena/code/src
@@ -15,7 +16,9 @@ M3LCRYPT=M3lcrypt/code
 TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
 
-EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
+EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
+phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs phs-pomelo \
+phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -23,7 +26,7 @@ phs-antcrypt: main.c AntCrypt/source/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 phs-argon: main.c Argon/Reference_implementation/argon-ref.cpp
-	$(CPP) $(CPPFLAGS) -o $@ main.c Argon/Reference_implementation/argon-ref.cpp
+	$(CPP) $(CPPFLAGS) -o $@ $^
 
 phs-battcrypt: main.c  $(BATTCRYPT)/battcrypt.cpp $(BATTCRYPT)/blowfish.cpp $(BATTCRYPT)/sha512.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
@@ -55,6 +58,9 @@ phs-m3lcrypt: main.c $(M3LCRYPT)/Sha2.c $(M3LCRYPT)/m3lcrypt.c
 
 phs-makwa: main.c Makwa/c/makwa.c Makwa/c/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
+
+phs-mcsphs: main.c MCS_PHS/code/mcs_psw/mcs_psw.cpp MCS_PHS/code/mcssha8/mcssha8.cpp
+	$(CPP) $(CPPFLAGS) -o $@ $^
 
 phs-pomelo: main.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
