@@ -17,8 +17,8 @@ TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
-phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs phs-pomelo \
-phs-schvrch phs-tortuga phs-twocats phs-yarn
+phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
+phs-omegacrypt phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -61,6 +61,9 @@ phs-makwa: main.c Makwa/c/makwa.c Makwa/c/phc.c
 
 phs-mcsphs: main.c MCS_PHS/code/mcs_psw/mcs_psw.cpp MCS_PHS/code/mcssha8/mcssha8.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
+
+phs-omegacrypt: main.c OmegaCrypt/chacha-wrapper.c OmegaCrypt/cubehash.c OmegaCrypt/ocrypt.c OmegaCrypt/nettle-chacha/chacha-init.c OmegaCrypt/nettle-chacha/chacha-crypt.c OmegaCrypt/nettle-chacha/chacha-core-internal.c OmegaCrypt/nettle-chacha/memxor.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 phs-pomelo: main.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
