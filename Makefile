@@ -18,7 +18,8 @@ TWOCATS=TwoCats/twocats
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
-phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-schvrch phs-tortuga phs-twocats phs-yarn
+phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
+phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -76,6 +77,9 @@ phs-polypasshash: main.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyP
 
 phs-pufferfish: main.c Pufferfish/src/optimized/pufferfish.c Pufferfish/src/optimized/sha512.c Pufferfish/src/optimized/hmac-sha512.c Pufferfish/src/common/itoa64.c Pufferfish/src/common/api.c
 	$(CC) $(CFLAGS) -DOPTIMIZED -o $@ $^
+
+phs-rig: main.c RIG/source/rig.cpp RIG/source/BLAKE/blake2b-ref.c
+	$(CPP) $(CPPFLAGS) -o $@ $^
 
 phs-schvrch: main.c Schvrch/schvrch.c
 	$(CC) $(CFLAGS) -o $@ $^
