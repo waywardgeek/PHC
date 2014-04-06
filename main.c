@@ -95,6 +95,7 @@ int main(int argc, char **argv) {
     uint32_t saltlen = 4;
     bool outputDieharderText = false;
     bool outputDieharderBinary = false;
+    int r;
 
     char c;
     while((c = getopt(argc, argv, "d:Dp:")) != -1) {
@@ -132,8 +133,8 @@ int main(int argc, char **argv) {
             uint8_t pwdbuf[passwordlen + 4];
             memcpy(pwdbuf, password, passwordlen);
             encodeLittleEndian(pwdbuf + passwordlen, &i, 4);
-            if(PHS(out, outlen, pwdbuf, passwordlen + 4, salt, saltlen, t_cost, m_cost)) {
-                printf("Password hashing for %s failed!\n", argv[0]);
+            if((r = PHS(out, outlen, pwdbuf, passwordlen + 4, salt, saltlen, t_cost, m_cost))) {
+                printf("Password hashing for %s failed with code %d!\n", argv[0], r);
                 return 1;
             }
             if(outputDieharderText) {
@@ -150,8 +151,8 @@ int main(int argc, char **argv) {
             }
         }
     } else {
-        if(PHS(out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost)) {
-            printf("Password hashing for %s failed!\n", argv[0]);
+        if((r = PHS(out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost))) {
+            printf("Password hashing for %s failed with code %d!\n", argv[0], r);
             return 1;
         }
         printHex("", out, outlen);
