@@ -28,8 +28,7 @@
 #ifndef _SHA2_H
 #define _SHA2_H
 
-#include <stdint.h>
-#include <endian.h>
+#include <sys/endian.h>
 
 #define li_64(h) 0x##h##ull
 
