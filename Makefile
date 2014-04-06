@@ -1,7 +1,7 @@
 CC=gcc
 CPP=g++
-#CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
-CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
+CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
+#CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
 #CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
 CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
 
@@ -15,11 +15,12 @@ LYRA=Lyra2/src/sse
 M3LCRYPT=M3lcrypt/code
 TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
+YESCRIPT=Yescrypt/yescrypt-0.5
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
 phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
-phs-schvrch phs-tortuga phs-twocats phs-yarn
+phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescript
 
 all: $(EXE)
 
@@ -91,6 +92,9 @@ phs-twocats: main.c $(TWOCATS)/twocats-common.c $(TWOCATS)/twocats-blake2s.c $(T
 	$(CC) $(CFLAGS) -o $@ $^
 
 phs-yarn: main.c Yarn/yarn.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+phs-yescript: main.c $(YESCRIPT)/yescrypt-best.c $(YESCRIPT)/yescrypt-common.c $(YESCRIPT)/sha256.c $(YESCRIPT)/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
