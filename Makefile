@@ -1,7 +1,7 @@
 CC=gcc
 CPP=g++
-CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
-#CFLAGS=-Wall -g -march=native -std=c99 -pthread -lcrypto -lm
+#CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
+CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
 #CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
 CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
 
@@ -18,7 +18,7 @@ TWOCATS=TwoCats/twocats
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
-phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn
+phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-schvrch phs-tortuga phs-twocats phs-yarn
 
 all: $(EXE)
 
@@ -73,6 +73,9 @@ phs-pomelo: main.c POMELO/pomelo.c
 
 phs-polypasshash: main.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyPassHash/polypasshash-c/lib/libgfshare.c
 	$(CC) $(CFLAGS) -IPolyPassHash/polypasshash-c/include -o $@ $^
+
+phs-pufferfish: main.c Pufferfish/src/optimized/pufferfish.c Pufferfish/src/optimized/sha512.c Pufferfish/src/optimized/hmac-sha512.c Pufferfish/src/common/itoa64.c Pufferfish/src/common/api.c
+	$(CC) $(CFLAGS) -DOPTIMIZED -o $@ $^
 
 phs-schvrch: main.c Schvrch/schvrch.c
 	$(CC) $(CFLAGS) -o $@ $^

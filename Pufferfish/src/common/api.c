@@ -132,7 +132,7 @@ int PHS (void *out, size_t outlen, const void *in, size_t inlen, const void *sal
                 return 1;
         }
 
-        memmove (out, hash, strlen (hash));
+        memmove (out, hash, outlen);
         free (settings);
         free (hash);
 
