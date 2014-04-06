@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <getopt.h>
+#include <errno.h>
+#include <time.h>
 
 #ifdef __cplusplus
 #define EXTERNC extern "C"
@@ -27,7 +29,8 @@ static void usage(const char *format, ...) {
         "                        %s -twocats -d | dieharder -g 200 -a | tee diehard.out\n"
         "    -d num-calls     -- Output text to stdout for use in dieharder testing, using:\n"
         "                        %s -twocats -d > foo; dieharder -g 202 -f foo\n"
-        "    -p password      -- provide a string as the password\n",
+        "    -p password      -- provide a string as the password\n"
+        "    -T repeats      -- Output only run time for repeated call\n",
         exeName, exeName, exeName);
     exit(1);
 }
@@ -83,22 +86,68 @@ static void encodeLittleEndian(uint8_t *dst, const uint32_t *src, uint32_t len) 
     }
 }
 
+static void time_ms(struct timespec *start, struct timespec *end, double *ms)
+{
+    double start_ms, end_ms;
+
+    start_ms = start->tv_sec * 1000.0 + start->tv_nsec / (1000.0 * 1000);
+    end_ms   = end->tv_sec * 1000.0 + end->tv_nsec / (1000.0 * 1000);
+
+    *ms = end_ms - start_ms;
+}
+
+static int time_PHS(int repeat, void *out, size_t outlen, const void *in, size_t inlen,
+                    const void *salt, size_t saltlen, unsigned int t_cost, unsigned int m_cost)
+{
+    int i, r;
+    struct timespec start, end;
+    double ms;
+    char dout[outlen];
+
+    r = PHS(dout, outlen, in, inlen, salt, saltlen, t_cost, m_cost);
+    if (r)
+        return r;
+
+    if (clock_gettime(CLOCK_MONOTONIC, &start) < 0)
+        return -EINVAL;
+
+    for (i = 0; i < repeat; i++) {
+        r = PHS(out, outlen, in, inlen, salt, saltlen, t_cost, m_cost);
+        if (r)
+            return r;
+        if (memcmp(dout, out, outlen)) {
+            printf("Output differs in iteration %d.\n", i);
+            return -EINVAL;
+        }
+    }
+
+    if (clock_gettime(CLOCK_MONOTONIC, &end) < 0)
+        return -EINVAL;
+
+    time_ms(&start, &end, &ms);
+    printf("Runtime: %2.0f ms\n", ms);
+
+    return 0;
+}
+
 int main(int argc, char **argv) {
     exeName = argv[0];
 
     uint8_t out[32];
     char *password = (char *)"password";
     uint32_t passwordlen = 12;
-    uint8_t *salt = (uint8_t *)"salt";
+    uint8_t *salt = (uint8_t *)"salt\0\0\0\0\0\0\0\0\0\0\0\0";
     uint32_t numCalls = 1;
     uint32_t outlen = 32;
-    uint32_t saltlen = 4;
+    uint32_t saltlen = 16;
+    uint32_t repeat = 1;
     bool outputDieharderText = false;
     bool outputDieharderBinary = false;
+    bool outputTime = false;
     int r;
 
     char c;
-    while((c = getopt(argc, argv, "d:Dp:")) != -1) {
+    while((c = getopt(argc, argv, "d:Dp:T:")) != -1) {
         switch (c) {
         case 'd':
             outputDieharderText = true;
@@ -110,6 +159,10 @@ int main(int argc, char **argv) {
         case 'p':
             password = optarg;
             passwordlen = strlen(password);
+            break;
+        case 'T':
+            outputTime = true;
+            repeat = readUint32(c, optarg);
             break;
         default:
             usage("Invalid argument");
@@ -150,6 +203,12 @@ int main(int argc, char **argv) {
                 printHex("", out, outlen);
             }
         }
+    } else if (outputTime) {
+        if((r = time_PHS(repeat, out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost))) {
+            printf("Password hashing for %s failed with code %d!\n", argv[0], r);
+            return 1;
+        }
+        printHex("", out, outlen);
     } else {
         if((r = PHS(out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost))) {
             printf("Password hashing for %s failed with code %d!\n", argv[0], r);
