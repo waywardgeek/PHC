@@ -5,7 +5,7 @@ function password() {
   echo $pass;
 }
 
-for phs in phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge phs-earworm phs-gambit phs-lanarea phs-pomelo phs-schvrch phs-tortuga phs-twocats phs-yarn; do 
+for phs in phs-*; do
     echo "************ Running $phs with t_cost=1 m_cost=1, 1000 repeats"
     ./$phs -p 0123456789abcdef -T 1000 1 1
 

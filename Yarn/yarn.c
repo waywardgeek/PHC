@@ -237,7 +237,7 @@ int yarn(void *out, size_t outlen, const void *in, size_t inlen, const void *sal
 		/* Invalid parameters */
 		return 0;
 	}
-	if (!(state = malloc(16 * (par + 1 + initrnd))) || !(memory = malloc(16 << m_cost))) {
+	if (!(state = malloc(16 * (par + 1 + initrnd))) || !(memory = malloc(16ULL << m_cost))) {
 		if (state != NULL) {
 			free(state);
 		}

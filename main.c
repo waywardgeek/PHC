@@ -29,8 +29,9 @@ static void usage(const char *format, ...) {
         "                        %s -twocats -d | dieharder -g 200 -a | tee diehard.out\n"
         "    -d num-calls     -- Output text to stdout for use in dieharder testing, using:\n"
         "                        %s -twocats -d > foo; dieharder -g 202 -f foo\n"
+        "    -G               -- Generate test vectors for various t_cost/m_cost values\n"
         "    -p password      -- provide a string as the password\n"
-        "    -T repeats      -- Output only run time for repeated call\n",
+        "    -T repeats       -- Output only run time for repeated call\n",
         exeName, exeName, exeName);
     exit(1);
 }
@@ -97,11 +98,11 @@ static void time_ms(struct timespec *start, struct timespec *end, double *ms)
 }
 
 static int time_PHS(int repeat, void *out, size_t outlen, const void *in, size_t inlen,
-                    const void *salt, size_t saltlen, unsigned int t_cost, unsigned int m_cost)
+                    const void *salt, size_t saltlen, unsigned int t_cost, unsigned int
+                    m_cost, double *ms)
 {
     int i, r;
     struct timespec start, end;
-    double ms;
     char dout[outlen];
 
     r = PHS(dout, outlen, in, inlen, salt, saltlen, t_cost, m_cost);
@@ -124,10 +125,57 @@ static int time_PHS(int repeat, void *out, size_t outlen, const void *in, size_t
     if (clock_gettime(CLOCK_MONOTONIC, &end) < 0)
         return -EINVAL;
 
-    time_ms(&start, &end, &ms);
-    printf("Runtime: %2.0f ms\n", ms);
+    time_ms(&start, &end, ms);
 
     return 0;
+}
+
+// Print the hash value in hex.
+static void printCompactHex(const char *message, uint8_t *data, uint8_t len) {
+    printf("%s", message);
+    for(uint32_t i = 0; i < len; i++) {
+        printf("%02x", data[i]);
+    }
+}
+
+// Print a test vector.
+static bool printTest(uint8_t *password, uint32_t passwordSize, uint8_t *salt, uint32_t saltSize,
+        uint32_t t_cost, uint32_t m_cost) {
+    uint8_t hash[32];
+    int r;
+    double ms;
+    if((r = time_PHS(1, hash, 32, password, passwordSize, salt, saltSize, t_cost, m_cost, &ms))) {
+        printf("Password hashing for %s failed with code %d!\n", exeName, r);
+        return 1;
+    }
+    printCompactHex("password:", password, passwordSize);
+    printCompactHex(" salt:", salt, saltSize);
+    printf(" t_cost:%u m_cost:%u ", t_cost, m_cost);
+    printCompactHex("-> ", hash, 32);
+    printf("\n");
+    return ms < 0.1;
+}
+
+// Print test vectors.
+static void printTestVectors(void) {
+    // Verify password and salt from 0 to 255 for t_cost = 0 .. 7 and m_cost = 0 .. 7
+    for(uint32_t t_cost = 0; t_cost < 8; t_cost++) {
+        bool tooLong = false;
+        for(uint32_t m_cost = 0; m_cost < 8 && !tooLong; m_cost++) {
+            for(uint32_t i = 0; i < 256; i++) {
+                uint8_t v = i;
+                printTest(&v, 1, NULL, 0, t_cost, m_cost);
+                printTest(NULL, 0, &v, 1, t_cost, m_cost);
+                tooLong = !printTest(&v, 1, &v, 1, t_cost, m_cost);
+                if(tooLong && m_cost == 0) {
+                    return;
+                }
+            }
+            if(tooLong) {
+                break;
+            }
+        }
+    }
 }
 
 int main(int argc, char **argv) {
@@ -147,7 +195,7 @@ int main(int argc, char **argv) {
     int r;
 
     char c;
-    while((c = getopt(argc, argv, "d:Dp:T:")) != -1) {
+    while((c = getopt(argc, argv, "d:DGp:T:")) != -1) {
         switch (c) {
         case 'd':
             outputDieharderText = true;
@@ -156,6 +204,9 @@ int main(int argc, char **argv) {
         case 'D':
             outputDieharderBinary = true;
             break;
+        case 'G':
+            printTestVectors();
+            return 0;
         case 'p':
             password = optarg;
             passwordlen = strlen(password);
@@ -168,11 +219,12 @@ int main(int argc, char **argv) {
             usage("Invalid argument");
         }
     }
+
     if(optind + 2 != argc) {
         usage("Invalid number of arguments");
     }
-    uint32_t m_cost = readUint32('\0', argv[optind]);
-    uint32_t t_cost = readUint32('0', argv[optind+1]);
+    uint32_t t_cost = readUint32('0', argv[optind]);
+    uint32_t m_cost = readUint32('\0', argv[optind+1]);
         
     if(outputDieharderText) {
         printf("type: d\n"
@@ -204,10 +256,12 @@ int main(int argc, char **argv) {
             }
         }
     } else if (outputTime) {
-        if((r = time_PHS(repeat, out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost))) {
+        double ms;
+        if((r = time_PHS(repeat, out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost, &ms))) {
             printf("Password hashing for %s failed with code %d!\n", argv[0], r);
             return 1;
         }
+        printf("Runtime: %2.0f ms\n", ms);
         printHex("", out, outlen);
     } else {
         if((r = PHS(out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost))) {
