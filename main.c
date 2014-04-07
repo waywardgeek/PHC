@@ -17,6 +17,20 @@
 EXTERNC int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
     unsigned int t_cost, unsigned int m_cost);
 
+// These must be defined in the *-limits file
+extern uint32_t MIN_TCOST;
+extern uint32_t MAX_TCOST;
+extern uint32_t TCOST_LOGARITHMIC;
+extern uint32_t MIN_MCOST;
+extern uint32_t MAX_MCOST;
+extern uint32_t MCOST_LOGARITHMIC;
+extern uint32_t MIN_INLEN;
+extern uint32_t MAX_INLEN;
+extern uint32_t MIN_SALTLEN;
+extern uint32_t MAX_SALTLEN;
+extern uint32_t MIN_OUTLEN;
+extern uint32_t MAX_OUTLEN;
+
 static char *exeName = NULL;
 
 static void usage(const char *format, ...) {
@@ -139,8 +153,8 @@ static void printCompactHex(const char *message, uint8_t *data, uint8_t len) {
 }
 
 // Print a test vector.
-static bool printTest(uint8_t *password, uint32_t passwordSize, uint8_t *salt, uint32_t saltSize,
-        uint32_t t_cost, uint32_t m_cost) {
+static bool printTest(double maxTime, uint32_t outlen, uint8_t *password, uint32_t passwordSize,
+        uint8_t *salt, uint32_t saltSize, uint32_t t_cost, uint32_t m_cost) {
     uint8_t hash[32];
     int r;
     double ms;
@@ -153,28 +167,60 @@ static bool printTest(uint8_t *password, uint32_t passwordSize, uint8_t *salt, u
     printf(" t_cost:%u m_cost:%u ", t_cost, m_cost);
     printCompactHex("-> ", hash, 32);
     printf("\n");
-    return ms < 0.1;
+    return ms < maxTime;
 }
 
 // Print test vectors.
-static void printTestVectors(void) {
-    // Verify password and salt from 0 to 255 for t_cost = 0 .. 7 and m_cost = 0 .. 7
-    for(uint32_t t_cost = 0; t_cost < 8; t_cost++) {
-        bool tooLong = false;
-        for(uint32_t m_cost = 0; m_cost < 8 && !tooLong; m_cost++) {
-            for(uint32_t i = 0; i < 256; i++) {
-                uint8_t v = i;
-                printTest(&v, 1, NULL, 0, t_cost, m_cost);
-                printTest(NULL, 0, &v, 1, t_cost, m_cost);
-                tooLong = !printTest(&v, 1, &v, 1, t_cost, m_cost);
-                if(tooLong && m_cost == 0) {
-                    return;
-                }
+static void printTestVectors(double maxTime) {
+
+    // Generate vectors for password and salt from 0 to 255 for t_cost = 0 .. 7 and m_cost = 0 .. 7
+    uint8_t *password = (uint8_t *)"password";
+    uint8_t *salt = (uint8_t *)"saltsaltsaltsalt";
+    bool tooLong = false;
+    for(uint32_t i = 0; i < 256 && !tooLong; i++) {
+        uint8_t v = i;
+        if(MIN_SALTLEN == 0) {
+            printTest(maxTime, 32, &v, 1, NULL, 0, MIN_TCOST, MIN_MCOST);
+            printTest(maxTime, 32, NULL, 0, &v, 1, MIN_TCOST, MIN_MCOST);
+            tooLong = !printTest(maxTime, 32, &v, 1, &v, 1, MIN_TCOST, MIN_MCOST);
+        } else {
+            tooLong = !printTest(maxTime, 32, &v, 1, salt, MIN_SALTLEN, MIN_TCOST, MIN_MCOST);
+        }
+    }
+
+    // Generate vectors for a good range of m_cost and t_cost
+    uint32_t t_cost = MIN_TCOST;
+    while(t_cost <= MAX_TCOST) {
+        tooLong = false;
+        uint32_t m_cost = MIN_MCOST;
+        while(m_cost <= MAX_MCOST && !tooLong) {
+            tooLong = !printTest(maxTime, 32, password, 8, salt, 16, t_cost, m_cost);
+            if(tooLong && m_cost == 0) {
+                return;
             }
             if(tooLong) {
                 break;
             }
+            if(m_cost == 0) {
+                m_cost = 1;
+            } else if(MCOST_LOGARITHMIC) {
+                m_cost++;
+            } else {
+                m_cost += m_cost + (m_cost >> 1);
+            }
         }
+        if(t_cost == 0) {
+            t_cost = 1;
+        } else if(TCOST_LOGARITHMIC) {
+            t_cost++;
+        } else {
+            t_cost += t_cost + (t_cost >> 1);
+        }
+    }
+
+    // Generate different output lengths
+    for(uint32_t i = MIN_OUTLEN; i < MAX_OUTLEN; i++) {
+        printTest(maxTime, i, password, 8, salt, 16, MIN_TCOST, MIN_MCOST);
     }
 }
 
@@ -205,7 +251,7 @@ int main(int argc, char **argv) {
             outputDieharderBinary = true;
             break;
         case 'G':
-            printTestVectors();
+            printTestVectors(100.0);
             return 0;
         case 'p':
             password = optarg;

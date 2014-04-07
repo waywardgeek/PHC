@@ -1,7 +1,7 @@
 CC=gcc
 CPP=g++
-CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
-#CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
+#CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
+CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
 CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
 #CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
 
@@ -24,77 +24,77 @@ phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescript
 
 all: $(EXE)
 
-phs-antcrypt: main.c AntCrypt/source/phc.c
+phs-antcrypt: main.c limits/antcrypt-limits.c AntCrypt/source/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-argon: main.c Argon/Reference_implementation/argon-ref.cpp
+phs-argon: main.c limits/argon-limits.c Argon/Reference_implementation/argon-ref.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-battcrypt: main.c  $(BATTCRYPT)/battcrypt.cpp $(BATTCRYPT)/blowfish.cpp $(BATTCRYPT)/sha512.cpp
+phs-battcrypt: main.c limits/battcrypt-limits.c  $(BATTCRYPT)/battcrypt.cpp $(BATTCRYPT)/blowfish.cpp $(BATTCRYPT)/sha512.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-catena: main.c $(CATENA)/catena.c $(CATENA)/catena-blake2b.c $(CATENA)/blake2/blake2b.c
+phs-catena: main.c limits/catena-limits.c $(CATENA)/catena.c $(CATENA)/catena-blake2b.c $(CATENA)/blake2/blake2b.c
 	$(CC) $(CFLAGS)  -fgnu89-inline -I$(CATENA)/blake2 -o $@ $^
 
-phs-catfish: main.c $(CATFISH)/catfish.c $(CATFISH)/KeccakF-1600-reference.c $(CATFISH)/KeccakSponge.c $(CATFISH)/displayIntermediateValues.c $(CATFISH)/pkhash_1024.c
+phs-catfish: main.c limits/catfish-limits.c $(CATFISH)/catfish.c $(CATFISH)/KeccakF-1600-reference.c $(CATFISH)/KeccakSponge.c $(CATFISH)/displayIntermediateValues.c $(CATFISH)/pkhash_1024.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-centrifuge: main.c Centrifuge/cfuge.c
+phs-centrifuge: main.c limits/centrifuge-limits.c Centrifuge/cfuge.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-earworm: main.c $(EARWORM)/aes.c $(EARWORM)/core-opt.c $(EARWORM)/phc.c $(EARWORM)/sha256.c $(EARWORM)/util-opt.h
+phs-earworm: main.c limits/earworm-limits.c $(EARWORM)/aes.c $(EARWORM)/core-opt.c $(EARWORM)/phc.c $(EARWORM)/sha256.c $(EARWORM)/util-opt.h
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-gambit: main.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
+phs-gambit: main.c limits/gambit-limits.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-lanarea: main.c $(LANAREA)/lanarea.c
+phs-lanarea: main.c limits/lanarea-limits.c $(LANAREA)/lanarea.c
 	(cd $(LANAREA)/libb2; autoreconf; automake --add-missing; ./configure && make)
 	$(CC) $(CFLAGS) -o $@ $^ $(LANAREA)/libb2/src/.libs/libb2_la-blake2b.o
 
-phs-lyra: main.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
+phs-lyra: main.c limits/lyra-limits.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-m3lcrypt: main.c $(M3LCRYPT)/Sha2.c $(M3LCRYPT)/m3lcrypt.c
+phs-m3lcrypt: main.c limits/m3lcrypt-limits.c $(M3LCRYPT)/Sha2.c $(M3LCRYPT)/m3lcrypt.c
 	$(CC) $(CFLAGS) -D_HF=0 -D_VSPACE=16 -o $@ $^
 
-phs-makwa: main.c Makwa/c/makwa.c Makwa/c/phc.c
+phs-makwa: main.c limits/makwa-limits.c Makwa/c/makwa.c Makwa/c/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-mcsphs: main.c MCS_PHS/code/mcs_psw/mcs_psw.cpp MCS_PHS/code/mcssha8/mcssha8.cpp
+phs-mcsphs: main.c limits/mcsphs-limits.c MCS_PHS/code/mcs_psw/mcs_psw.cpp MCS_PHS/code/mcssha8/mcssha8.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-omegacrypt: main.c OmegaCrypt/chacha-wrapper.c OmegaCrypt/cubehash.c OmegaCrypt/ocrypt.c OmegaCrypt/nettle-chacha/chacha-init.c OmegaCrypt/nettle-chacha/chacha-crypt.c OmegaCrypt/nettle-chacha/chacha-core-internal.c OmegaCrypt/nettle-chacha/memxor.c
+phs-omegacrypt: main.c limits/omegacrypt-limits.c OmegaCrypt/chacha-wrapper.c OmegaCrypt/cubehash.c OmegaCrypt/ocrypt.c OmegaCrypt/nettle-chacha/chacha-init.c OmegaCrypt/nettle-chacha/chacha-crypt.c OmegaCrypt/nettle-chacha/chacha-core-internal.c OmegaCrypt/nettle-chacha/memxor.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-parallela: main.c Parallel/code/c++/parallel.cpp Parallel/code/c++/sha512.cpp
+phs-parallela: main.c limits/parallela-limits.c Parallel/code/c++/parallel.cpp Parallel/code/c++/sha512.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-pomelo: main.c POMELO/pomelo.c
+phs-pomelo: main.c limits/pomelo-limits.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-polypasshash: main.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyPassHash/polypasshash-c/lib/libgfshare.c
+phs-polypasshash: main.c limits/polypasshash-limits.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyPassHash/polypasshash-c/lib/libgfshare.c
 	$(CC) $(CFLAGS) -IPolyPassHash/polypasshash-c/include -o $@ $^
 
-phs-pufferfish: main.c Pufferfish/src/optimized/pufferfish.c Pufferfish/src/optimized/sha512.c Pufferfish/src/optimized/hmac-sha512.c Pufferfish/src/common/itoa64.c Pufferfish/src/common/api.c
+phs-pufferfish: main.c limits/pufferfish-limits.c Pufferfish/src/optimized/pufferfish.c Pufferfish/src/optimized/sha512.c Pufferfish/src/optimized/hmac-sha512.c Pufferfish/src/common/itoa64.c Pufferfish/src/common/api.c
 	$(CC) $(CFLAGS) -DOPTIMIZED -o $@ $^
 
-phs-rig: main.c RIG/source/rig.cpp RIG/source/BLAKE/blake2b-ref.c
+phs-rig: main.c limits/rig-limits.c RIG/source/rig.cpp RIG/source/BLAKE/blake2b-ref.c
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-schvrch: main.c Schvrch/schvrch.c
+phs-schvrch: main.c limits/schvrch-limits.c Schvrch/schvrch.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-tortuga: main.c $(TORTUGA)/turtle.c $(TORTUGA)/tortuga.c $(TORTUGA)/phs.c
+phs-tortuga: main.c limits/tortuga-limits.c $(TORTUGA)/turtle.c $(TORTUGA)/tortuga.c $(TORTUGA)/phs.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-twocats: main.c $(TWOCATS)/twocats-common.c $(TWOCATS)/twocats-blake2s.c $(TWOCATS)/twocats-blake2b.c $(TWOCATS)/twocats-sha256.c $(TWOCATS)/twocats-sha512.c $(TWOCATS)/twocats.c
+phs-twocats: main.c limits/twocats-limits.c $(TWOCATS)/twocats-common.c $(TWOCATS)/twocats-blake2s.c $(TWOCATS)/twocats-blake2b.c $(TWOCATS)/twocats-sha256.c $(TWOCATS)/twocats-sha512.c $(TWOCATS)/twocats.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-yarn: main.c Yarn/yarn.c
+phs-yarn: main.c limits/yarn-limits.c Yarn/yarn.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-yescript: main.c $(YESCRIPT)/yescrypt-best.c $(YESCRIPT)/yescrypt-common.c $(YESCRIPT)/sha256.c $(YESCRIPT)/phc.c
+phs-yescript: main.c limits/yescript-limits.c $(YESCRIPT)/yescrypt-best.c $(YESCRIPT)/yescrypt-common.c $(YESCRIPT)/sha256.c $(YESCRIPT)/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
