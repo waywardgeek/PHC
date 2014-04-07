@@ -1,7 +1,7 @@
 CC=gcc
 CPP=g++
-#CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
-CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
+CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
+#CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
 CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
 #CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
 

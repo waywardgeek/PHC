@@ -155,17 +155,17 @@ static void printCompactHex(const char *message, uint8_t *data, uint8_t len) {
 // Print a test vector.
 static bool printTest(double maxTime, uint32_t outlen, uint8_t *password, uint32_t passwordSize,
         uint8_t *salt, uint32_t saltSize, uint32_t t_cost, uint32_t m_cost) {
-    uint8_t hash[32];
+    uint8_t hash[outlen];
     int r;
     double ms;
-    if((r = time_PHS(1, hash, 32, password, passwordSize, salt, saltSize, t_cost, m_cost, &ms))) {
+    if((r = time_PHS(1, hash, outlen, password, passwordSize, salt, saltSize, t_cost, m_cost, &ms))) {
         printf("Password hashing for %s failed with code %d!\n", exeName, r);
         return 1;
     }
     printCompactHex("password:", password, passwordSize);
     printCompactHex(" salt:", salt, saltSize);
     printf(" t_cost:%u m_cost:%u ", t_cost, m_cost);
-    printCompactHex("-> ", hash, 32);
+    printCompactHex("-> ", hash, outlen);
     printf("\n");
     return ms < maxTime;
 }
@@ -195,7 +195,7 @@ static void printTestVectors(double maxTime) {
         uint32_t m_cost = MIN_MCOST;
         while(m_cost <= MAX_MCOST && !tooLong) {
             tooLong = !printTest(maxTime, 32, password, 8, salt, 16, t_cost, m_cost);
-            if(tooLong && m_cost == 0) {
+            if(tooLong && m_cost == MIN_MCOST) {
                 return;
             }
             if(tooLong) {
