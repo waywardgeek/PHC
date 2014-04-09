@@ -1,9 +1,9 @@
 CC=gcc
 CPP=g++
-CFLAGS=-Wall -O3 -march=native -std=gnu99 -pthread -lcrypto -lm
-#CFLAGS=-Wall -g -march=native -std=gnu99 -pthread -lcrypto -lm
-CPPFLAGS=-Wall -O3 -march=native -pthread -lcrypto -lm
-#CPPFLAGS=-Wall -g -march=native -pthread -lcrypto -lm
+CFLAGS=-Wall -march=native -std=gnu99 -pthread -lcrypto -lm
+CPPFLAGS=-Wall -march=native -pthread -lcrypto -lm
+OPT_CFLAGS=-O3
+DEV_CFLAGS=-g
 
 BATTCRYPT=Battcrypt/code/c++
 CATENA=Catena/code/src
@@ -21,6 +21,16 @@ EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
 phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
 phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescript
+
+default: opt
+
+opt: CFLAGS += $(OPT_CFLAGS)
+opt: CPPFLAGS += $(OPT_CFLAGS)
+opt: all
+
+debug: CFLAGS += $(DEV_CFLAGS)
+debug: CPPFLAGS += $(DEV_CFLAGS)
+debug: all
 
 all: $(EXE)
 
