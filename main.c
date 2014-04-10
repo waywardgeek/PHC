@@ -17,6 +17,9 @@
 EXTERNC int PHS(void *out, size_t outlen, const void *in, size_t inlen, const void *salt, size_t saltlen,
     unsigned int t_cost, unsigned int m_cost);
 
+// Simple hack to insure input t_cost and m_cost are valid for the PHS.
+void validateCosts(uint32_t *t_cost, uint32_t *m_cost);
+
 // These must be defined in the *-limits file
 extern uint32_t MIN_TCOST;
 extern uint32_t MAX_TCOST;
@@ -155,6 +158,7 @@ static void printCompactHex(const char *message, uint8_t *data, uint8_t len) {
 // Print a test vector.
 static bool printTest(double maxTime, uint32_t outlen, uint8_t *password, uint32_t passwordSize,
         uint8_t *salt, uint32_t saltSize, uint32_t t_cost, uint32_t m_cost) {
+printf("Doing test %u %u\n", t_cost, m_cost);
     uint8_t hash[outlen];
     int r;
     double ms;
@@ -179,12 +183,15 @@ static void printTestVectors(double maxTime) {
     bool tooLong = false;
     for(uint32_t i = 0; i < 256 && !tooLong; i++) {
         uint8_t v = i;
+        uint32_t t_cost = MIN_TCOST;
+        uint32_t m_cost = MIN_MCOST;
+        validateCosts(&t_cost, &m_cost);
         if(MIN_SALTLEN == 0) {
-            printTest(maxTime, 32, &v, 1, NULL, 0, MIN_TCOST, MIN_MCOST);
-            printTest(maxTime, 32, NULL, 0, &v, 1, MIN_TCOST, MIN_MCOST);
-            tooLong = !printTest(maxTime, 32, &v, 1, &v, 1, MIN_TCOST, MIN_MCOST);
+            printTest(maxTime, 32, &v, 1, NULL, 0, t_cost, m_cost);
+            printTest(maxTime, 32, NULL, 0, &v, 1, t_cost, m_cost);
+            tooLong = !printTest(maxTime, 32, &v, 1, &v, 1, t_cost, m_cost);
         } else {
-            tooLong = !printTest(maxTime, 32, &v, 1, salt, MIN_SALTLEN, MIN_TCOST, MIN_MCOST);
+            tooLong = !printTest(maxTime, 32, &v, 1, salt, MIN_SALTLEN, t_cost, m_cost);
         }
     }
 
@@ -193,6 +200,7 @@ static void printTestVectors(double maxTime) {
     while(t_cost <= MAX_TCOST) {
         tooLong = false;
         uint32_t m_cost = MIN_MCOST;
+        validateCosts(&t_cost, &m_cost);
         while(m_cost <= MAX_MCOST && !tooLong) {
             tooLong = !printTest(maxTime, 32, password, 8, salt, 16, t_cost, m_cost);
             if(tooLong && m_cost == MIN_MCOST) {
@@ -220,6 +228,9 @@ static void printTestVectors(double maxTime) {
 
     // Generate different output lengths
     for(uint32_t i = MIN_OUTLEN; i < MAX_OUTLEN; i++) {
+        uint32_t t_cost = MIN_TCOST;
+        uint32_t m_cost = MIN_MCOST;
+        validateCosts(&t_cost, &m_cost);
         printTest(maxTime, i, password, 8, salt, 16, MIN_TCOST, MIN_MCOST);
     }
 }
