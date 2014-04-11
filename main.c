@@ -214,7 +214,7 @@ static void printTestVectors(double maxTime) {
             } else if(MCOST_LOGARITHMIC) {
                 m_cost++;
             } else {
-                m_cost += m_cost + (m_cost >> 1);
+                m_cost += 1 + (m_cost >> 1);
             }
         }
         if(t_cost == 0) {
@@ -222,7 +222,7 @@ static void printTestVectors(double maxTime) {
         } else if(TCOST_LOGARITHMIC) {
             t_cost++;
         } else {
-            t_cost += t_cost + (t_cost >> 1);
+            t_cost += 1 + (t_cost >> 1);
         }
     }
 

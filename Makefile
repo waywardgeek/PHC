@@ -37,8 +37,11 @@ all: $(EXE)
 phs-antcrypt: main.c limits/antcrypt-limits.c AntCrypt/source/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-argon: main.c limits/argon-limits.c Argon/Reference_implementation/argon-ref.cpp
-	$(CPP) $(CPPFLAGS) -o $@ $^
+#phs-argon: main.c limits/argon-limits.c Argon/Reference_implementation/argon-ref.cpp
+	#$(CPP) $(CPPFLAGS) -o $@ $^
+
+phs-argon: main.c limits/argon-limits.c Argon/Argon-Optimized/Linux-AES-NI/Argon-Optimized.cpp
+	$(CPP) $(CPPFLAGS) -maes -mavx -std=c++11 -o $@ $^
 
 phs-battcrypt: main.c limits/battcrypt-limits.c  $(BATTCRYPT)/battcrypt.cpp $(BATTCRYPT)/blowfish.cpp $(BATTCRYPT)/sha512.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
