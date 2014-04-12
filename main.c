@@ -158,7 +158,6 @@ static void printCompactHex(const char *message, uint8_t *data, uint8_t len) {
 // Print a test vector.
 static bool printTest(double maxTime, uint32_t outlen, uint8_t *password, uint32_t passwordSize,
         uint8_t *salt, uint32_t saltSize, uint32_t t_cost, uint32_t m_cost) {
-printf("Doing test %u %u\n", t_cost, m_cost);
     uint8_t hash[outlen];
     int r;
     double ms;
@@ -216,6 +215,7 @@ static void printTestVectors(double maxTime) {
             } else {
                 m_cost += 1 + (m_cost >> 1);
             }
+            validateCosts(&t_cost, &m_cost);
         }
         if(t_cost == 0) {
             t_cost = 1;
@@ -224,6 +224,7 @@ static void printTestVectors(double maxTime) {
         } else {
             t_cost += 1 + (t_cost >> 1);
         }
+        validateCosts(&t_cost, &m_cost);
     }
 
     // Generate different output lengths

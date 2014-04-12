@@ -17,4 +17,8 @@ uint32_t MAX_OUTLEN = 2048;
 // Only needed if there are invalid t_cost/m_cost combinations.  Increase one or the other
 // to make them valid.
 void validateCosts(uint32_t *t_cost, uint32_t *m_cost) {
+    *m_cost |= 1;
+    if(*m_cost*2 > *t_cost * (168/8)) {
+        *t_cost = (*m_cost*2*8 + 167)/168;
+    }
 }
