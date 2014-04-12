@@ -15,12 +15,12 @@ LYRA=Lyra2/src/sse
 M3LCRYPT=M3lcrypt/code
 TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
-YESCRIPT=Yescrypt/yescrypt-0.5
+YESCRYPT=Yescrypt/yescrypt-0.5
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
 phs-omegacrypt phs-parallela phs-pomelo phs-pufferfish phs-rig \
-phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescript
+phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescrypt
 
 default: opt
 
@@ -109,7 +109,7 @@ phs-twocats: main.c limits/twocats-limits.c $(TWOCATS)/twocats-common.c $(TWOCAT
 phs-yarn: main.c limits/yarn-limits.c Yarn/yarn.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-yescript: main.c limits/yescript-limits.c $(YESCRIPT)/yescrypt-best.c $(YESCRIPT)/yescrypt-common.c $(YESCRIPT)/sha256.c $(YESCRIPT)/phc.c
+phs-yescrypt: main.c limits/yescrypt-limits.c $(YESCRYPT)/yescrypt-best.c $(YESCRYPT)/yescrypt-common.c $(YESCRYPT)/sha256.c $(YESCRYPT)/phc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
