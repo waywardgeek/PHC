@@ -240,8 +240,8 @@ int main(int argc, char **argv) {
 
     uint8_t out[32];
     char *password = (char *)"password";
-    uint32_t passwordlen = 12;
-    uint8_t *salt = (uint8_t *)"salt\0\0\0\0\0\0\0\0\0\0\0\0";
+    uint32_t passwordlen = 8;
+    uint8_t *salt = (uint8_t *)"saltsaltsaltsalt";
     uint32_t numCalls = 1;
     uint32_t outlen = 32;
     uint32_t saltlen = 16;

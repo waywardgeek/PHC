@@ -19,7 +19,7 @@ YESCRIPT=Yescrypt/yescrypt-0.5
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
-phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
+phs-omegacrypt phs-parallela phs-pomelo phs-pufferfish phs-rig \
 phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescript
 
 default: opt
@@ -86,6 +86,8 @@ phs-parallela: main.c limits/parallela-limits.c Parallel/code/c++/parallel.cpp P
 phs-pomelo: main.c limits/pomelo-limits.c POMELO/pomelo.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+# This one is not built by default since it seems to require setup functions be called
+# before PHS.
 phs-polypasshash: main.c limits/polypasshash-limits.c PolyPassHash/polypasshash-c/src/libpolypasshash.c PolyPassHash/polypasshash-c/lib/libgfshare.c
 	$(CC) $(CFLAGS) -IPolyPassHash/polypasshash-c/include -o $@ $^
 
