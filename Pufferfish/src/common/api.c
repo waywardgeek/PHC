@@ -123,7 +123,8 @@ int PHS (void *out, size_t outlen, const void *in, size_t inlen, const void *sal
 {
         /* required PHS api */
 
-        unsigned char *bytes = pfkdf (outlen*8, in, t_cost, m_cost);
+        char *settings = pf_gensalt (salt, saltlen, t_cost, m_cost);
+        unsigned char *bytes = pufferfish (in, inlen, settings, outlen, true);
         memmove (out, bytes, outlen);
         free (bytes);
 
