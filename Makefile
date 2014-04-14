@@ -8,18 +8,15 @@ DEV_CFLAGS=-g
 BATTCRYPT=Battcrypt/code/c++
 CATENA=Catena/code/src
 CATFISH=Catfish/ref-c
-EARWORM=EARWORM
 GAMBIT=Gambit/src
-LANAREA=Lanarea
 LYRA=Lyra2/src/sse
 M3LCRYPT=M3lcrypt/code
-TORTUGA=Tortuga
 TWOCATS=TwoCats/twocats
 YESCRYPT=Yescrypt/yescrypt-0.5
 
 EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
-phs-omegacrypt phs-parallela phs-pomelo phs-pufferfish phs-rig \
+phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
 phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescrypt
 
 default: opt
@@ -55,15 +52,15 @@ phs-catfish: main.c limits/catfish-limits.c $(CATFISH)/catfish.c $(CATFISH)/Kecc
 phs-centrifuge: main.c limits/centrifuge-limits.c Centrifuge/cfuge.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-earworm: main.c limits/earworm-limits.c $(EARWORM)/aes.c $(EARWORM)/core-opt.c $(EARWORM)/phc.c $(EARWORM)/sha256.c $(EARWORM)/util-opt.h
+phs-earworm: main.c limits/earworm-limits.c EARWORM/aes.c EARWORM/core-opt.c EARWORM/phc.c EARWORM/sha256.c EARWORM/util-opt.h
 	$(CC) $(CFLAGS) -o $@ $^
 
 phs-gambit: main.c limits/gambit-limits.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^
 
-phs-lanarea: main.c limits/lanarea-limits.c $(LANAREA)/lanarea.c
-	(cd $(LANAREA)/libb2; autoreconf; automake --add-missing; ./configure && make)
-	$(CC) $(CFLAGS) -o $@ $^ $(LANAREA)/libb2/src/.libs/libb2_la-blake2b.o
+phs-lanarea: main.c limits/lanarea-limits.c Lanarea/lanarea.c
+	(cd Lanarea/libb2; autoreconf; automake --add-missing; ./configure && make)
+	$(CC) $(CFLAGS) -o $@ $^ Lanarea/libb2/src/.libs/libb2_la-blake2b.o
 
 phs-lyra: main.c limits/lyra-limits.c $(LYRA)/Sponge.c $(LYRA)/Lyra2.c
 	$(CC) $(CFLAGS) -o $@ $^
@@ -100,7 +97,7 @@ phs-rig: main.c limits/rig-limits.c RIG/source/rig.cpp RIG/source/BLAKE/blake2b-
 phs-schvrch: main.c limits/schvrch-limits.c Schvrch/schvrch.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-phs-tortuga: main.c limits/tortuga-limits.c $(TORTUGA)/turtle.c $(TORTUGA)/tortuga.c $(TORTUGA)/phs.c
+phs-tortuga: main.c limits/tortuga-limits.c Tortuga/turtle.c Tortuga/tortuga.c Tortuga/phs.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 phs-twocats: main.c limits/twocats-limits.c $(TWOCATS)/twocats-common.c $(TWOCATS)/twocats-blake2s.c $(TWOCATS)/twocats-blake2b.c $(TWOCATS)/twocats-sha256.c $(TWOCATS)/twocats-sha512.c $(TWOCATS)/twocats.c
