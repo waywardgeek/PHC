@@ -7,14 +7,13 @@ DEV_CFLAGS=-g
 
 BATTCRYPT=Battcrypt/code/c++
 CATENA=Catena/code/src
-CATFISH=Catfish/ref-c
 GAMBIT=Gambit/src
 LYRA=Lyra2/src/sse
 M3LCRYPT=M3lcrypt/code
 TWOCATS=TwoCats/twocats
 YESCRYPT=Yescrypt/yescrypt-0.5
 
-EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-catfish phs-centrifuge \
+EXE=phs-antcrypt phs-argon phs-battcrypt phs-catena phs-centrifuge \
 phs-earworm phs-gambit phs-lanarea phs-lyra phs-m3lcrypt phs-makwa phs-mcsphs \
 phs-omegacrypt phs-parallela phs-polypasshash phs-pomelo phs-pufferfish phs-rig \
 phs-schvrch phs-tortuga phs-twocats phs-yarn phs-yescrypt
@@ -45,9 +44,6 @@ phs-battcrypt: main.c limits/battcrypt-limits.c  $(BATTCRYPT)/battcrypt.cpp $(BA
 
 phs-catena: main.c limits/catena-limits.c $(CATENA)/catena.c $(CATENA)/catena-blake2b.c $(CATENA)/blake2/blake2b.c
 	$(CC) $(CFLAGS)  -fgnu89-inline -I$(CATENA)/blake2 -o $@ $^
-
-phs-catfish: main.c limits/catfish-limits.c $(CATFISH)/catfish.c $(CATFISH)/KeccakF-1600-reference.c $(CATFISH)/KeccakSponge.c $(CATFISH)/displayIntermediateValues.c $(CATFISH)/pkhash_1024.c
-	$(CC) $(CFLAGS) -o $@ $^
 
 phs-centrifuge: main.c limits/centrifuge-limits.c Centrifuge/cfuge.c
 	$(CC) $(CFLAGS) -o $@ $^
