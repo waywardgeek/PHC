@@ -6,7 +6,7 @@
 //To enable measurement of SubGroups and ShuffleSlices, uncomment #define _MEASUREINT
 //To disable threading, comment #define THREADING
 
-#define ARGON_TEST
+//#define ARGON_TEST
 //#define KAT
 //#define KAT_INTERNAL
 #define _MEASURE
