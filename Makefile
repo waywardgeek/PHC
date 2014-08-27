@@ -49,7 +49,7 @@ phs-centrifuge: main.c limits/centrifuge-limits.c Centrifuge/cfuge.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 phs-earworm: main.c limits/earworm-limits.c EARWORM/aes.c EARWORM/core-opt.c EARWORM/phc.c EARWORM/sha256.c EARWORM/util-opt.h
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -DEARWORM_BUILD_OPT -o $@ $^
 
 phs-gambit: main.c limits/gambit-limits.c $(GAMBIT)/gambit.cpp $(GAMBIT)/keccak.cpp
 	$(CPP) $(CPPFLAGS) -o $@ $^

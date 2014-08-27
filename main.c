@@ -7,6 +7,7 @@
 #include <getopt.h>
 #include <errno.h>
 #include <time.h>
+#include <pthread.h>
 
 #ifdef __cplusplus
 #define EXTERNC extern "C"
@@ -48,6 +49,7 @@ static void usage(const char *format, ...) {
         "                        %s -twocats -d > foo; dieharder -g 202 -f foo\n"
         "    -G               -- Generate test vectors for various t_cost/m_cost values\n"
         "    -p password      -- provide a string as the password\n"
+        "    -P parallelism   -- How many threads to launch in parallel\n"
         "    -T repeats       -- Output only run time for repeated call\n",
         exeName, exeName, exeName);
     exit(1);
@@ -114,29 +116,65 @@ static void time_ms(struct timespec *start, struct timespec *end, double *ms)
     *ms = end_ms - start_ms;
 }
 
-static int time_PHS(int repeat, void *out, size_t outlen, const void *in, size_t inlen,
+// Hack to pass parameters to threads
+struct ContextStruct {
+    uint32_t repeat;
+    uint32_t parallelism;
+    void *out;
+    size_t outlen;
+    const void *in;
+    size_t inlen;
+    const void *salt;
+    size_t saltlen;
+    unsigned int t_cost;
+    unsigned m_cost;
+    double *ms;
+};
+
+static void *runPHSThread(void *contextPtr) {
+    struct ContextStruct *c = (struct ContextStruct *)contextPtr;
+    for(uint32_t i = 0; i < c->repeat; i++) {
+        int r = PHS(c->out, c->outlen, c->in, c->inlen, c->salt, c->saltlen, c->t_cost, c->m_cost);
+        if (r) {
+            printf("Error while hashing: %u\n", r);
+            exit(1);
+        }
+    }
+    pthread_exit(NULL);
+}
+
+static int time_PHS(uint32_t repeat, uint32_t parallelism, void *out, size_t outlen, const void *in, size_t inlen,
                     const void *salt, size_t saltlen, unsigned int t_cost, unsigned int
                     m_cost, double *ms)
 {
-    int i, r;
     struct timespec start, end;
-    char dout[outlen];
-
-    r = PHS(dout, outlen, in, inlen, salt, saltlen, t_cost, m_cost);
-    if (r)
-        return r;
 
     if (clock_gettime(CLOCK_MONOTONIC, &start) < 0)
         return -EINVAL;
 
-    for (i = 0; i < repeat; i++) {
-        r = PHS(out, outlen, in, inlen, salt, saltlen, t_cost, m_cost);
-        if (r)
-            return r;
-        if (memcmp(dout, out, outlen)) {
-            printf("Output differs in iteration %d.\n", i);
-            return -EINVAL;
+    struct ContextStruct c;
+    c.repeat = repeat;
+    c.parallelism = parallelism;
+    c.out = out;
+    c.outlen = outlen;
+    c.in = in;
+    c.inlen = inlen;
+    c.salt = salt;
+    c.saltlen = saltlen;
+    c.t_cost = t_cost;
+    c.m_cost = m_cost;
+    c.ms = ms;
+
+    pthread_t memThreads[parallelism];
+    for(uint32_t p = 0; p < parallelism; p++) {
+        int rc = pthread_create(&memThreads[p], NULL, runPHSThread, &c);
+        if(rc) {
+            fprintf(stderr, "Unable to start threads\n");
+            return false;
         }
+    }
+    for(uint32_t p = 0; p < parallelism; p++) {
+        (void)pthread_join(memThreads[p], NULL);
     }
 
     if (clock_gettime(CLOCK_MONOTONIC, &end) < 0)
@@ -161,7 +199,7 @@ static bool printTest(double maxTime, uint32_t outlen, uint8_t *password, uint32
     uint8_t hash[outlen];
     int r;
     double ms;
-    if((r = time_PHS(1, hash, outlen, password, passwordSize, salt, saltSize, t_cost, m_cost, &ms))) {
+    if((r = time_PHS(1, 1, hash, outlen, password, passwordSize, salt, saltSize, t_cost, m_cost, &ms))) {
         printf("Password hashing for %s failed with code %d!\n", exeName, r);
         return 1;
     }
@@ -247,13 +285,14 @@ int main(int argc, char **argv) {
     uint32_t outlen = 32;
     uint32_t saltlen = 16;
     uint32_t repeat = 1;
+    uint32_t parallelism = 1;
     bool outputDieharderText = false;
     bool outputDieharderBinary = false;
     bool outputTime = false;
     int r;
 
     char c;
-    while((c = getopt(argc, argv, "d:DGp:T:")) != -1) {
+    while((c = getopt(argc, argv, "d:DGp:P:T:")) != -1) {
         switch (c) {
         case 'd':
             outputDieharderText = true;
@@ -272,6 +311,9 @@ int main(int argc, char **argv) {
         case 'T':
             outputTime = true;
             repeat = readUint32(c, optarg);
+            break;
+        case 'P':
+            parallelism = readUint32(c, optarg);
             break;
         default:
             usage("Invalid argument");
@@ -315,7 +357,8 @@ int main(int argc, char **argv) {
         }
     } else if (outputTime) {
         double ms;
-        if((r = time_PHS(repeat, out, outlen, (uint8_t *)password, passwordlen, salt, saltlen, t_cost, m_cost, &ms))) {
+        if((r = time_PHS(repeat, parallelism, out, outlen, (uint8_t *)password,
+                passwordlen, salt, saltlen, t_cost, m_cost, &ms))) {
             printf("Password hashing for %s failed with code %d!\n", argv[0], r);
             return 1;
         }
